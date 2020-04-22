@@ -1,0 +1,173 @@
+const express = require('express');
+const mysql = require('mysql');
+const bodyParser = require('body-parser');
+const jwt = require('jsonwebtoken')
+const SecretKey = "Uf0*wVVnkBVg+Yr@C4YSWBT";
+const HeaderKey = "Pz6WbvhZAQGsUtAxRJK3vtXCrJDW6kb3yMwtnGKu2kpfT9PRVUg8RuYqFWfvFptqftcF87mBbV7pJWmPCPR5fZentc3qQVTtGLbqbjvGquT5B8UT2Kvjk7BCUm7hqtkqmJ3yR6fMFdWkWwvjTjrtSZjs52TdKC5Xazvp6b22pKNQSybvNb4mAwwuzXQFLKM7Pq5htpNNg8ZJ9dZJUF8gqc3aFXywYvaFLMXWdNUfErL8GEgUR3sEpNajEXbUcLLh";
+const RedirectLink = "https://www.harshitaapptech.com/";
+
+//for live
+var connection = mysql.createConnection({
+    //properties of mysql connection
+    host: 'localhost',
+    user: 'harsmnhg_admin',
+    password: 'Rahu1sharma#',
+    database: 'harsmnhg_todos'
+});
+
+var app = express();
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+//listen for '/'
+app.get('/todo/api/', (_, resp) => {
+    console.log('inside / nothing to see here , redirecting to ', RedirectLink);
+    //mysql
+    //to redirect user to a specific page
+    resp.redirect(RedirectLink);
+});
+
+
+//login user
+app.post('/todo/api/login/', verifyHeader, function (req, res) {
+
+    console.log('login called ');
+
+    if (req.key === HeaderKey) {
+
+        console.log('header validated ');
+
+        var data = req.body;
+        var uid = data.uid;
+        var email = data.email;
+        var os = data.os;
+        var app_ver = data.app_ver;
+
+        if (typeof uid === 'undefined' || typeof email === 'undefined') {
+
+            console.log('email and uid not valid');
+
+            res.sendStatus(422);
+
+        } else {
+
+            const user = {
+                id: uid,
+                email: email,
+                os: os,
+                app_ver: app_ver
+            }
+
+            console.log('user ', user);
+
+            jwt.sign({ user: user }, SecretKey, (err, token) => {
+                if (!!err) {
+                    console.log('error creating token ', err);
+
+                    const obj = {
+                        message: 'Login failed',
+                        error: 'true',
+                        token: null
+                    };
+                    res.status(400).json(obj);
+                } else {
+                    console.log('token created');
+
+                    const obj = {
+                        message: 'Login success',
+                        error: 'false',
+                        token: token
+                    };
+                    res.status(200).json(obj);
+                }
+            });
+        }
+
+    } else {
+
+        console.log('header is not valid in login ');
+
+        res.sendStatus(400);
+    }
+});
+
+//get all todos of a user
+app.get('/todo/api/get-todo', verifyToken, function (req, resp) {
+
+    jwt.verify(req.token, SecretKey, (err, authData) => {
+        if (!!err) {
+            res.sendStatus(401);
+        } else {
+            //user is verified
+            var userID = authData.id;
+            var limit = 10;
+
+            connection.query("SELECT * FROM todos WHERE user_id = ? limit = ?", [userID, limit], function (error, rows) {
+                if (!!error) {
+                    console.log('error ', error);
+                    obj = {
+                        error: true,
+                        message: "error " + error,
+                        todo: null
+                    }
+                    resp.status(400).send(obj);
+                } else {
+                    console.log('count ');
+                    obj = {
+                        error: false,
+                        message: "You have some data",
+                        todo: rows
+                    }
+                    resp.status(200).send(obj);
+                }
+            });
+        }
+    });
+});
+
+
+
+// -------------------------- Functions ------------nodemon---------------------------------- //
+
+//Format of token
+// Authorization: Bearer <access_token>
+//Verify token function
+
+function verifyToken(req, res, next) {
+    //get auth header value
+    const bearerHeader = req.headers['authorization'];
+    // check if not is undefined
+
+    if (typeof bearerHeader !== 'undefined') {
+        //spilit at the space
+        const bearer = bearerHeader.split(' ');
+        //get token from array
+        const bearerToken = bearer[1];
+        //set the token
+        req.token = bearerToken;
+        //next middleware
+        next();
+    } else {
+        // forbidden
+        res.sendStatus(403);
+    }
+}
+
+//Format of token
+// key: key
+//Verify token function
+
+function verifyHeader(req, res, next) {
+    //get auth header value
+    const keyHeader = req.headers['key'];
+    // check if not is undefined
+
+    if (typeof keyHeader !== 'undefined') {
+        req.key = keyHeader;
+        //next middleware
+        next();
+    } else {
+        // forbidden
+        res.sendStatus(403);
+    }
+}
