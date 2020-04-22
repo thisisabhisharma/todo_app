@@ -1,5 +1,8 @@
 # todo_app
 
+## TODO
+  - Add google sign in
+
 ## Project setup
 ```
 npm install
