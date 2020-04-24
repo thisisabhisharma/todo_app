@@ -10,7 +10,6 @@ import Todos from '../components/Todo'
 import AddTodo from '../components/AddTodo'
 import axios from 'axios'
 
-
 export default {
   name: 'Home',
   components: {
@@ -37,11 +36,6 @@ export default {
         .catch(err => console.log('errror while post req', err));
       }
   },
-
-  // {
-  //   success: true/false,
-  //   message: "User ID not found", "Todo ID not found", "Deleted"
-  // }
   created() {
         console.log('before api get request sent ')
         axios.get('https://jsonplaceholder.typicode.com/todos?_limit=5')

@@ -24,9 +24,10 @@ export default {
 <style scoped>
 
     .todo-item {
-    background: #f4f4f4;
-    padding: 10px;
-    border-bottom: 1px #ccc dotted;
+      text-align: left;
+      background: #f4f4f4;
+      padding: 10px;
+      border-bottom: 1px #ccc dotted;
   }
   .is-complete {
     text-decoration: line-through;
