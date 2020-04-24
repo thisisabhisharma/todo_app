@@ -10,8 +10,8 @@ const RedirectLink = "https://www.harshitaapptech.com/";
 var connection = mysql.createConnection({
     //properties of mysql connection
     host: 'localhost',
-    user: 'harsmnhg_admin',
-    password: 'Rahu1sharma#',
+    user: 'root',
+    password: '',
     database: 'harsmnhg_todos'
 });
 
@@ -27,7 +27,6 @@ app.get('/todo/api/', (_, resp) => {
     resp.redirect(RedirectLink);
 });
 
-
 //login user
 app.post('/todo/api/login/', verifyHeader, function (req, res) {
 
@@ -38,7 +37,7 @@ app.post('/todo/api/login/', verifyHeader, function (req, res) {
         console.log('header validated ');
 
         var data = req.body;
-        var uid = data.uid;
+        var password = data.password;
         var email = data.email;
         var os = data.os;
         var app_ver = data.app_ver;
@@ -73,12 +72,25 @@ app.post('/todo/api/login/', verifyHeader, function (req, res) {
                 } else {
                     console.log('token created');
 
-                    const obj = {
-                        message: 'Login success',
-                        error: 'false',
-                        token: token
-                    };
-                    res.status(200).json(obj);
+                    connection.query("INSERT INTO `users`(`text`, `email`) VALUES (?,?)", [email, text], function (error, rows) {
+                        if (!!error) {
+                            console.log('error ', error);
+                            obj = {
+                                error: true,
+                                message: "error " + error,
+                                todo: null
+                            }
+                            resp.status(400).send(obj);
+                        } else {
+                            console.log('user created');
+                            const obj = {
+                                message: 'Login success',
+                                error: 'false',
+                                token: token
+                            };
+                            res.status(200).json(obj);
+                        }
+                    });
                 }
             });
         }
@@ -89,6 +101,102 @@ app.post('/todo/api/login/', verifyHeader, function (req, res) {
 
         res.sendStatus(400);
     }
+});
+
+//create todo
+app.get('/todo/api/get-todo', verifyToken, function (req, resp) {
+
+    jwt.verify(req.token, SecretKey, (err, authData) => {
+        if (!!err) {
+            res.sendStatus(401);
+        } else {
+            //user is verified
+            var email = authData.email;
+            var text = req.body.data.text;
+
+            connection.query("INSERT INTO `todos`(`text`, `email`) VALUES (?,?)", [email, text], function (error, rows) {
+                if (!!error) {
+                    console.log('error ', error);
+                    obj = {
+                        error: true,
+                        message: "error " + error,
+                        todo: null
+                    }
+                    resp.status(400).send(obj);
+                } else {
+                    console.log('count ');
+                    obj = {
+                        error: false,
+                        message: "You have some data",
+                        todo: rows
+                    }
+                    resp.status(200).send(obj);
+                }
+            });
+        }
+    });
+});
+
+//complete todo
+app.get('/todo/api/complete/:todoID', verifyToken, function (req, resp) {
+
+    jwt.verify(req.token, SecretKey, (err, authData) => {
+        if (!!err) {
+            res.sendStatus(401);
+        } else {
+            //user is verified
+            var todoID = req.params.todoID;
+
+            connection.query("UPDATE `todos` SET `completed`= ABS(`completed` - 1) WHERE `todo_id` = ?", [todoID], function (error, rows) {
+                if (!!error) {
+                    console.log('error ', error);
+                    obj = {
+                        error: true,
+                        message: "error " + error
+                    }
+                    resp.status(400).send(obj);
+                } else {
+                    console.log('completed');
+                    obj = {
+                        error: false,
+                        message: "Completed"
+                    }
+                    resp.status(200).send(obj);
+                }
+            });
+        }
+    });
+});
+
+//remove todo
+app.get('/todo/api/remove/:todoID', verifyToken, function (req, resp) {
+
+    jwt.verify(req.token, SecretKey, (err, authData) => {
+        if (!!err) {
+            res.sendStatus(401);
+        } else {
+            //user is verified
+            var todoID = req.params.todoID;
+
+            connection.query("UPDATE `todos` SET `removed`= ABS(`removed` - 1) WHERE `todo_id` = ?", [todoID], function (error, rows) {
+                  if (!!error) {
+                    console.log('error ', error);
+                    obj = {
+                        error: true,
+                        message: "error " + error
+                    }
+                    resp.status(400).send(obj);
+                } else {
+                    console.log('Removed ');
+                    obj = {
+                        error: false,
+                        message: "todo removed"
+                    }
+                    resp.status(200).send(obj);
+                }
+            });
+        }
+    });
 });
 
 //get all todos of a user
@@ -124,8 +232,6 @@ app.get('/todo/api/get-todo', verifyToken, function (req, resp) {
         }
     });
 });
-
-
 
 // -------------------------- Functions ------------nodemon---------------------------------- //
 
