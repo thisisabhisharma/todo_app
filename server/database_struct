@@ -1,0 +1,15 @@
+
+Users
+    email       =   Varchar(100)    = primary_key
+    name        =   Varchar(50)
+    profile     =   Varchar(200)
+    remove      =   Int(1)
+    timestamp   =   timestamp
+
+Todos
+    todo_id     =   Int(10)         = primary_key
+    email       =   Varchar(100)    = foreign_key
+    text        =   Varchar(500)
+    completed   =   Int(1)
+    removed     =   Int(1)
+    timestamp   =   timestamp
