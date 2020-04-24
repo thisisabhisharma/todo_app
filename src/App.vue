@@ -1,53 +1,17 @@
 <template>
   <div id="app">
     <Header />
-    <AddTodo v-on:add-todo="addTodo" />
-    <Todos v-bind:todos="todos" v-on:del-todo="deleteTodo"/>
+    <router-view/>
   </div>
 </template>
 
 <script>
 import Header from './components/layout/Header'
-import Todos from './components/Todo'
-import AddTodo from './components/AddTodo'
-import axios from 'axios'
-
-
 export default {
-  name: 'App',
+  name:"app",
   components: {
-    Header,
-    Todos,
-    AddTodo
-  },
-  data() {
-    return{
-      todos: []
-    }
-  }, 
-  methods: {
-    deleteTodo(id){
-      this.todos = this.todos.filter(todo => todo.id !== id);
-      },
-      addTodo(newTodo) {
-        this.todos = [...this.todos, newTodo];
-
-      }
-  },
-
-  // {
-  //   success: true/false,
-  //   message: "User ID not found", "Todo ID not found", "Deleted"
-  // }
-  created() {
-        console.log('before api get request sent ')
-        axios.get('https://jsonplaceholder.typicode.com/todos?_limit=5')
-          .then(response =>{
-            console.log('api get request sent ',response.data)
-            this.todos = response.data;
-          } )
-          .catch(err => console.log('this is the error in api',err));
-      }
+    Header
+  }
 }
 </script>
 
@@ -61,15 +25,25 @@ export default {
     font-family: Arial, Helvetica, sans-serif;
     line-height: 1.4;
   }
-  .btn {
-    display: inline-block;
-    border: none;
-    background: #555;
-    color: #fff;
-    padding: 7px 20px;
-    cursor: pointer;
-  }
-  .btn:hover {
-    background: #666;
-  }
+
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+}
+
+#nav {
+  padding: 30px;
+}
+
+#nav a {
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+#nav a.router-link-exact-active {
+  color: #42b983;
+}
 </style>
