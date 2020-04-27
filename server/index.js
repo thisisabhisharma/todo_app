@@ -87,7 +87,7 @@ app.post('/todo/api/login/', verifyHeader, function (req, res) {
                             console.log('user created');
                             const obj = {
                                 message: 'Login success',
-                                error: 'false',
+                                error: false,
                                 token: token
                             };
                             res.status(200).json(obj);
@@ -148,7 +148,7 @@ app.get('/todo/api/remove-user/', verifyToken, function (req, res) {
 });
 
 //create todo
-app.get('/todo/api/get-todo', verifyToken, function (req, resp) {
+app.post('/todo/api/create-todo', verifyToken, function (req, resp) {
 
     jwt.verify(req.token, SecretKey, (err, authData) => {
         if (!!err) {
@@ -156,9 +156,9 @@ app.get('/todo/api/get-todo', verifyToken, function (req, resp) {
         } else {
             //user is verified
             var email = authData.email;
-            var text = req.body.data.text;
+            var text = req.body.text;
 
-            connection.query("INSERT INTO `todos`(`text`, `email`) VALUES (?,?)", [email, text], function (error, rows) {
+            connection.query("INSERT INTO `todos`(`text`) VALUES (?)", [text], function (error, rows) {
                 if (!!error) {
                     console.log('error ', error);
                     obj = {
@@ -171,8 +171,7 @@ app.get('/todo/api/get-todo', verifyToken, function (req, resp) {
                     console.log('count ');
                     obj = {
                         error: false,
-                        message: "You have some data",
-                        todo: rows
+                        message: "Todo added"
                     }
                     resp.status(200).send(obj);
                 }
