@@ -4,6 +4,7 @@
     <!-- {{ this.$store.state.test }} -->
 
     <facebook-login
+      @click="loginClick()"
       class="button"
       appId="529086384442607"
       @login="onLogin"
@@ -11,19 +12,21 @@
       @sdk-loaded="sdkLoaded"
     >
     </facebook-login>
+    
 
     <div id="userProfile">
-      <img
-        @click="imgClick()"
-        id="userPic"
-        src="https://platform-lookaside.fbsbx.com/platform/profilepic/?asid=2924548724330152&height=50&width=50&ext=1590324315&hash=AeRa8OHDFgnlWkJ7"
-        alt=""
-      />
+
     </div>
     <div id="userProfile2">
+      <img @click="getUserData()" :src="userIcon" id="userPic"  width="50px" alt="">
       <p>{{ this.$store.state.profile.name }}</p>
       <p>{{ this.$store.state.profile.email }}</p>
     </div>
+    <div  v-for="pic in pics" :key="pic" >
+      <img :src="getImgUrl(pic)" v-bind:alt="getImgUrl">
+    </div>
+
+
     <!-- <p>url: {{ this.$store.state.imageURL.data.url }}</p> -->
     <!-- <img v-bind:src="imgName()" /> -->
   </div>
@@ -42,12 +45,23 @@ export default {
     facebookLogin,
   },
 
+     data() {
+      return {
+        // userIcon:['https://cdn4.iconfinder.com/data/icons/small-n-flat/24/user-alt-512.png']
+        userIcon:[this.$store.state.profile.pic]
+      };
+    },
+
   methods: {
     // imgName: function() {
 
     //   console.log("pic link is", this.$store.state.imageURL.data.url)
     //   return this.$store.state.imageURL;
     // },
+    getImgUrl(pic) {
+    return require( this.$store.state.profile.pic + pic)
+    },
+
 
     imgClick() {
       console.log("logo onclick fired");
@@ -58,10 +72,11 @@ export default {
         x.style.display = "block";
       } else {
         console.log("img else fired ");
-        console.log('');
+        console.log("");
         x.style.display = "none";
       }
     },
+
     loginClick() {
       console.log(" login onclick fired");
       var x = document.getElementById("userProfile");
@@ -86,8 +101,7 @@ export default {
           this.$store.state.profile.employee_id = userInformation.id;
           this.$store.state.profile.email = userInformation.email;
           this.$store.state.profile.name = userInformation.name;
-          this.picture = userInformation.picture;
-          this.$store.state.imageURL = userInformation.picture;
+          this.$store.state.profile.pic = userInformation.picture.data.url;
         }
       );
     },
@@ -128,7 +142,7 @@ export default {
   display: none;
 }
 #userProfile2 {
-  display: none;
+  /* display: none; */
   border: 3px solid #3b55a0;
   float: right;
   color: white;

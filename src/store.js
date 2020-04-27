@@ -10,9 +10,9 @@ export default new Vuex.Store({
         profile: {
             "name": "",
             "email": "",
-            "employee_id": ""
-        }
-        ,
+            "employee_id": "",
+            "pic": ""
+        },
         imageURL: []
     }
 })
