@@ -6,7 +6,10 @@
 </template>
 
 <script>
+
 import Header from './components/layout/Header'
+// const HeaderKey = "Pz6WbvhZAQGsUtAxRJK3vtXCrJDW6kb3yMwtnGKu2kpfT9PRVUg8RuYqFWfvFptqftcF87mBbV7pJWmPCPR5fZentc3qQVTtGLbqbjvGquT5B8UT2Kvjk7BCUm7hqtkqmJ3yR6fMFdWkWwvjTjrtSZjs52TdKC5Xazvp6b22pKNQSybvNb4mAwwuzXQFLKM7Pq5htpNNg8ZJ9dZJUF8gqc3aFXywYvaFLMXWdNUfErL8GEgUR3sEpNajEXbUcLLh";
+
 export default {
   name:"app",
   components: {
@@ -24,6 +27,8 @@ export default {
   body {
     font-family: Arial, Helvetica, sans-serif;
     line-height: 1.4;
+    background: rgb(2,0,36);
+    background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(182,28,209,1) 50%, rgba(2,0,36,1) 100%);
   }
 
 #app {
