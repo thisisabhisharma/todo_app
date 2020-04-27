@@ -19,6 +19,10 @@ var app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.listen(5000, () => {
+    console.log("started");
+});
+
 //listen for '/'
 app.get('/todo/api/', (_, resp) => {
     console.log('inside / nothing to see here , redirecting to ', RedirectLink);
@@ -37,12 +41,11 @@ app.post('/todo/api/login/', verifyHeader, function (req, res) {
         console.log('header validated ');
 
         var data = req.body;
-        var password = data.password;
         var email = data.email;
-        var os = data.os;
-        var app_ver = data.app_ver;
+        var photo = data.photo;
+        var name = data.name;
 
-        if (typeof uid === 'undefined' || typeof email === 'undefined') {
+        if (typeof email === 'undefined') {
 
             console.log('email and uid not valid');
 
@@ -51,10 +54,9 @@ app.post('/todo/api/login/', verifyHeader, function (req, res) {
         } else {
 
             const user = {
-                id: uid,
                 email: email,
-                os: os,
-                app_ver: app_ver
+                name: name,
+                photo: photo
             }
 
             console.log('user ', user);
@@ -72,7 +74,7 @@ app.post('/todo/api/login/', verifyHeader, function (req, res) {
                 } else {
                     console.log('token created');
 
-                    connection.query("INSERT INTO `users`(`text`, `email`) VALUES (?,?)", [email, text], function (error, rows) {
+                    connection.query("INSERT INTO `users`(`name`, `email`, `profile_url`) VALUES (?,?,?)", [name, email, photo], function (error, rows) {
                         if (!!error) {
                             console.log('error ', error);
                             obj = {
@@ -101,6 +103,48 @@ app.post('/todo/api/login/', verifyHeader, function (req, res) {
 
         res.sendStatus(400);
     }
+});
+
+//delete user
+app.get('/todo/api/remove-user/', verifyToken, function (req, res) {
+
+    jwt.verify(req.token, SecretKey, (err, authData) => {
+        if (!!err) {
+            res.sendStatus(401);
+        } else {
+            //user is verified
+            var userID = authData.email;
+
+            connection.query("DELETE FROM users WHERE user_id = ?", [userID], function (error, rows) {
+                if (!!error) {
+                    console.log('error ', error);
+                    obj = {
+                        error: true,
+                        message: "error " + error
+                    }
+                    resp.status(400).send(obj);
+                } else {
+                    connection.query("DELETE FROM todos WHERE user_id = ?", [userID], function (error, rows) {
+                        if (!!error) {
+                            console.log('error ', error);
+                            obj = {
+                                error: true,
+                                message: "error " + error
+                            }
+                            resp.status(400).send(obj);
+                        } else {
+                            console.log('completed');
+                            obj = {
+                                error: false,
+                                message: "Completed"
+                            }
+                            resp.status(200).send(obj);
+                        }
+                    });
+                }
+            });
+        }
+    });
 });
 
 //create todo
@@ -179,7 +223,7 @@ app.get('/todo/api/remove/:todoID', verifyToken, function (req, resp) {
             var todoID = req.params.todoID;
 
             connection.query("UPDATE `todos` SET `removed`= ABS(`removed` - 1) WHERE `todo_id` = ?", [todoID], function (error, rows) {
-                  if (!!error) {
+                if (!!error) {
                     console.log('error ', error);
                     obj = {
                         error: true,
@@ -210,7 +254,7 @@ app.get('/todo/api/get-todo', verifyToken, function (req, resp) {
             var userID = authData.id;
             var limit = 10;
 
-            connection.query("SELECT * FROM todos WHERE user_id = ? limit = ?", [userID, limit], function (error, rows) {
+            connection.query("SELECT * FROM todos WHERE user_id = ? limit = ? AND removed != 1", [userID, limit], function (error, rows) {
                 if (!!error) {
                     console.log('error ', error);
                     obj = {
@@ -267,6 +311,8 @@ function verifyHeader(req, res, next) {
     //get auth header value
     const keyHeader = req.headers['key'];
     // check if not is undefined
+
+    console.log('this is header key ', keyHeader);
 
     if (typeof keyHeader !== 'undefined') {
         req.key = keyHeader;
