@@ -12,21 +12,26 @@
       @sdk-loaded="sdkLoaded"
     >
     </facebook-login>
-    
+    <button @click="postReq()">
+      post req
+    </button>
 
-    <div id="userProfile">
-
-    </div>
+    <div id="userProfile"></div>
     <div id="userProfile2">
-      <img @click="getUserData()" :src="userIcon" id="userPic"  width="50px" alt="">
+      <img
+        @click="getUserData()"
+        :src="userIcon"
+        id="userPic"
+        width="50px"
+        alt=""
+      />
       <p>{{ this.$store.state.profile.name }}</p>
       <p>{{ this.$store.state.profile.email }}</p>
       <p></p>
     </div>
-    <div  v-for="pic in pics" :key="pic" >
-      <img :src="getImgUrl(pic)" v-bind:alt="getImgUrl">
-    </div>
-
+    <!-- <div v-for="pic in pics" :key="pic">
+      <img :src="getImgUrl(pic)" v-bind:alt="getImgUrl" />
+    </div> -->
 
     <!-- <p>url: {{ this.$store.state.imageURL.data.url }}</p> -->
     <!-- <img v-bind:src="imgName()" /> -->
@@ -35,6 +40,8 @@
 
 <script>
 import facebookLogin from "facebook-login-vuejs";
+import axios from "axios";
+
 // import Vue from 'vue'
 // import Vuex from 'vuex'
 
@@ -46,12 +53,12 @@ export default {
     facebookLogin,
   },
 
-     data() {
-      return {
-        // userIcon:['https://cdn4.iconfinder.com/data/icons/small-n-flat/24/user-alt-512.png']
-        userIcon:[this.$store.state.profile.pic]
-      };
-    },
+  data() {
+    return {
+      // userIcon:['https://cdn4.iconfinder.com/data/icons/small-n-flat/24/user-alt-512.png']
+      userIcon: [this.$store.state.profile.pic],
+    };
+  },
 
   methods: {
     // imgName: function() {
@@ -60,9 +67,8 @@ export default {
     //   return this.$store.state.imageURL;
     // },
     getImgUrl(pic) {
-    return require( this.$store.state.profile.pic + pic)
+      return require(this.$store.state.profile.pic + pic);
     },
-
 
     imgClick() {
       console.log("logo onclick fired");
@@ -104,16 +110,44 @@ export default {
           this.$store.state.profile.name = userInformation.name;
           this.$store.state.profile.pic = userInformation.picture.data.url;
         }
-      );
+      )
+      this.postReq()
     },
     sdkLoaded(payload) {
       this.isConnected = payload.isConnected;
       this.FB = payload.FB;
       if (this.isConnected) this.getUserData();
     },
+    
+
+    postReq() {
+
+      const baseURL = 'http://127.0.0.1:5000/todo/api/'
+      axios({
+          method: 'post',
+          url: baseURL + 'login/',
+          headers: {
+        'key' : "Pz6WbvhZAQGsUtAxRJK3vtXCrJDW6kb3yMwtnGKu2kpfT9PRVUg8RuYqFWfvFptqftcF87mBbV7pJWmPCPR5fZentc3qQVTtGLbqbjvGquT5B8UT2Kvjk7BCUm7hqtkqmJ3yR6fMFdWkWwvjTjrtSZjs52TdKC5Xazvp6b22pKNQSybvNb4mAwwuzXQFLKM7Pq5htpNNg8ZJ9dZJUF8gqc3aFXywYvaFLMXWdNUfErL8GEgUR3sEpNajEXbUcLLh",
+      },
+          data: {
+            name: this.$store.state.profile.name,
+            email: this.$store.state.profile.email,
+            photo: this.$store.state.profile.pic
+          }
+        })
+        .then((response) => {
+          var profile = response.data;
+          console.log("response is ", profile);
+        })
+        .catch((error) => {
+          console.log("error is: ", error);
+        });
+    },
+
     onLogin() {
       this.isConnected = true;
       this.getUserData();
+
       alert("You have successfully Logged In");
       this.loginClick();
     },
@@ -121,6 +155,7 @@ export default {
       this.isConnected = false;
       alert("You have successfully Logged Out");
     },
+
   },
 };
 </script>
