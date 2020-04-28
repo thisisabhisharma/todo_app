@@ -18,17 +18,17 @@ var connection = mysql.createConnection({
 var app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
- 
+
 app.listen(5000, () => {
     console.log("started");
 });
 
 //listen for '/'
-app.get('/todo/api/', (_, resp) => {
+app.get('/todo/api/', (_, res) => {
     console.log('inside / nothing to see here , redirecting to ', RedirectLink);
     //mysql
     //to redirect user to a specific page
-    resp.redirect(RedirectLink);
+    res.redirect(RedirectLink);
 });
 
 //login user
@@ -82,12 +82,12 @@ app.post('/todo/api/login/', verifyHeader, function (req, res) {
                                 message: "error " + error,
                                 todo: null
                             }
-                            resp.status(400).send(obj);
+                            res.status(400).send(obj);
                         } else {
                             console.log('user created');
                             const obj = {
                                 message: 'Login success',
-                                error: false,
+                                error: 'false',
                                 token: token
                             };
                             res.status(200).json(obj);
@@ -122,7 +122,7 @@ app.get('/todo/api/remove-user/', verifyToken, function (req, res) {
                         error: true,
                         message: "error " + error
                     }
-                    resp.status(400).send(obj);
+                    res.status(400).send(obj);
                 } else {
                     connection.query("DELETE FROM todos WHERE user_id = ?", [userID], function (error, rows) {
                         if (!!error) {
@@ -131,14 +131,14 @@ app.get('/todo/api/remove-user/', verifyToken, function (req, res) {
                                 error: true,
                                 message: "error " + error
                             }
-                            resp.status(400).send(obj);
+                            res.status(400).send(obj);
                         } else {
                             console.log('completed');
                             obj = {
                                 error: false,
                                 message: "Completed"
                             }
-                            resp.status(200).send(obj);
+                            res.status(200).send(obj);
                         }
                     });
                 }
@@ -148,7 +148,7 @@ app.get('/todo/api/remove-user/', verifyToken, function (req, res) {
 });
 
 //create todo
-app.post('/todo/api/create-todo', verifyToken, function (req, resp) {
+app.post('/todo/api/create-todo', verifyToken, function (req, res) {
 
     jwt.verify(req.token, SecretKey, (err, authData) => {
         if (!!err) {
@@ -158,22 +158,21 @@ app.post('/todo/api/create-todo', verifyToken, function (req, resp) {
             var email = authData.email;
             var text = req.body.text;
 
-            connection.query("INSERT INTO `todos`(`text`) VALUES (?)", [text], function (error, rows) {
+            connection.query("INSERT INTO `todos`(`text`, `email`) VALUES (?,?)", [email, text], function (error, rows) {
                 if (!!error) {
                     console.log('error ', error);
                     obj = {
                         error: true,
-                        message: "error " + error,
-                        todo: null
+                        message: "error " + error
                     }
-                    resp.status(400).send(obj);
+                    res.status(400).send(obj);
                 } else {
                     console.log('count ');
                     obj = {
                         error: false,
                         message: "Todo added"
                     }
-                    resp.status(200).send(obj);
+                    res.status(200).send(obj);
                 }
             });
         }
@@ -181,7 +180,7 @@ app.post('/todo/api/create-todo', verifyToken, function (req, resp) {
 });
 
 //complete todo
-app.get('/todo/api/complete/:todoID', verifyToken, function (req, resp) {
+app.get('/todo/api/complete/:todoID', verifyToken, function (req, res) {
 
     jwt.verify(req.token, SecretKey, (err, authData) => {
         if (!!err) {
@@ -197,14 +196,14 @@ app.get('/todo/api/complete/:todoID', verifyToken, function (req, resp) {
                         error: true,
                         message: "error " + error
                     }
-                    resp.status(400).send(obj);
+                    res.status(400).send(obj);
                 } else {
                     console.log('completed');
                     obj = {
                         error: false,
                         message: "Completed"
                     }
-                    resp.status(200).send(obj);
+                    res.status(200).send(obj);
                 }
             });
         }
@@ -212,7 +211,7 @@ app.get('/todo/api/complete/:todoID', verifyToken, function (req, resp) {
 });
 
 //remove todo
-app.get('/todo/api/remove/:todoID', verifyToken, function (req, resp) {
+app.get('/todo/api/remove/:todoID', verifyToken, function (req, res) {
 
     jwt.verify(req.token, SecretKey, (err, authData) => {
         if (!!err) {
@@ -228,14 +227,14 @@ app.get('/todo/api/remove/:todoID', verifyToken, function (req, resp) {
                         error: true,
                         message: "error " + error
                     }
-                    resp.status(400).send(obj);
+                    res.status(400).send(obj);
                 } else {
                     console.log('Removed ');
                     obj = {
                         error: false,
                         message: "todo removed"
                     }
-                    resp.status(200).send(obj);
+                    res.status(200).send(obj);
                 }
             });
         }
@@ -243,7 +242,7 @@ app.get('/todo/api/remove/:todoID', verifyToken, function (req, resp) {
 });
 
 //get all todos of a user
-app.get('/todo/api/get-todo', verifyToken, function (req, resp) {
+app.get('/todo/api/get-todo', verifyToken, function (req, res) {
 
     jwt.verify(req.token, SecretKey, (err, authData) => {
         if (!!err) {
@@ -261,7 +260,7 @@ app.get('/todo/api/get-todo', verifyToken, function (req, resp) {
                         message: "error " + error,
                         todo: null
                     }
-                    resp.status(400).send(obj);
+                    res.status(400).send(obj);
                 } else {
                     console.log('count ');
                     obj = {
@@ -269,7 +268,7 @@ app.get('/todo/api/get-todo', verifyToken, function (req, resp) {
                         message: "You have some data",
                         todo: rows
                     }
-                    resp.status(200).send(obj);
+                    res.status(200).send(obj);
                 }
             });
         }
