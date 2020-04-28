@@ -23,7 +23,6 @@
       />
       <p>{{ this.$store.state.profile.name }}</p>
       <p>{{ this.$store.state.profile.email }}</p>
-      <p></p>
     </div>
   </div>
 </template>
@@ -36,6 +35,11 @@ export default {
   name: "SignIn",
   components: {
     facebookLogin,
+  },
+  mounted(){
+    console.log('app mounted');
+    if (localStorage.getItem('token')) this.$store.state.token = JSON.parse(localStorage.getItem('token'));
+    console.log('store token value', this.$store.state.token);
   },
 
   data() {
@@ -117,8 +121,11 @@ export default {
           }
         })
         .then((response) => {
-          var profile = response.data;
+          var profile = response.data.token;
           console.log("response is ", profile);
+
+          localStorage.setItem('token', JSON.stringify(this.profile))
+          console.log('store token value is ', this.$store.state.token);
         })
         .catch((error) => {
           console.log("error is: ", error);
