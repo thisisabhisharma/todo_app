@@ -11,9 +11,6 @@
       @sdk-loaded="sdkLoaded"
     >
     </facebook-login>
-    <button @click="postReq()">
-      post req
-    </button>
 
     <div id="userProfile"></div>
     <div id="userProfile2">
