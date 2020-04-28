@@ -1,7 +1,6 @@
 <template>
   <div id="divid" class="signin">
     <h1>This is an sign-in page</h1>
-    <!-- {{ this.$store.state.test }} -->
 
     <facebook-login
       @click="loginClick()"
@@ -29,23 +28,12 @@
       <p>{{ this.$store.state.profile.email }}</p>
       <p></p>
     </div>
-    <!-- <div v-for="pic in pics" :key="pic">
-      <img :src="getImgUrl(pic)" v-bind:alt="getImgUrl" />
-    </div> -->
-
-    <!-- <p>url: {{ this.$store.state.imageURL.data.url }}</p> -->
-    <!-- <img v-bind:src="imgName()" /> -->
   </div>
 </template>
 
 <script>
 import facebookLogin from "facebook-login-vuejs";
 import axios from "axios";
-
-// import Vue from 'vue'
-// import Vuex from 'vuex'
-
-// var URL = this.$store.state.imageURL.data.url
 
 export default {
   name: "SignIn",
@@ -55,17 +43,12 @@ export default {
 
   data() {
     return {
-      // userIcon:['https://cdn4.iconfinder.com/data/icons/small-n-flat/24/user-alt-512.png']
       userIcon: [this.$store.state.profile.pic],
     };
   },
 
   methods: {
-    // imgName: function() {
 
-    //   console.log("pic link is", this.$store.state.imageURL.data.url)
-    //   return this.$store.state.imageURL;
-    // },
     getImgUrl(pic) {
       return require(this.$store.state.profile.pic + pic);
     },
@@ -98,8 +81,8 @@ export default {
         x.style.display = "none";
       }
     },
-    getUserData() {
-      this.FB.api(
+     getUserData() {
+        this.FB.api(
         "/me",
         "GET",
         { fields: "id,name,email,picture" },
@@ -111,18 +94,19 @@ export default {
           this.$store.state.profile.pic = userInformation.picture.data.url;
         }
       )
-      this.postReq()
-    },
-    sdkLoaded(payload) {
+    
+      },
+    sdkLoaded(payload,) {
       this.isConnected = payload.isConnected;
       this.FB = payload.FB;
       if (this.isConnected) this.getUserData();
+
     },
     
 
     postReq() {
-
-      const baseURL = 'http://127.0.0.1:5000/todo/api/'
+      setTimeout(() => {
+                const baseURL = 'http://127.0.0.1:5000/todo/api/'
       axios({
           method: 'post',
           url: baseURL + 'login/',
@@ -142,13 +126,15 @@ export default {
         .catch((error) => {
           console.log("error is: ", error);
         });
+      }, 1000)
     },
 
-    onLogin() {
+    onLogin(callback) {
       this.isConnected = true;
       this.getUserData();
-
       alert("You have successfully Logged In");
+      this.postReq()
+      callback();
       this.loginClick();
     },
     onLogout() {

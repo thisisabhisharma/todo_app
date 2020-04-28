@@ -6,13 +6,11 @@ Vue.use(Vuex, axios)
 
 export default new Vuex.Store({
     state: {
-        test: 'Test 123..',
         profile: {
             "name": "",
             "email": "",
             "employee_id": "",
             "pic": ""
-        },
-        imageURL: []
+        }
     }
 })
