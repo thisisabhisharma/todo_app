@@ -7,6 +7,19 @@ const SecretKey = "Uf0*wVVnkBVg+Yr@C4YSWBT";
 const HeaderKey = "Pz6WbvhZAQGsUtAxRJK3vtXCrJDW6kb3yMwtnGKu2kpfT9PRVUg8RuYqFWfvFptqftcF87mBbV7pJWmPCPR5fZentc3qQVTtGLbqbjvGquT5B8UT2Kvjk7BCUm7hqtkqmJ3yR6fMFdWkWwvjTjrtSZjs52TdKC5Xazvp6b22pKNQSybvNb4mAwwuzXQFLKM7Pq5htpNNg8ZJ9dZJUF8gqc3aFXywYvaFLMXWdNUfErL8GEgUR3sEpNajEXbUcLLh";
 const RedirectLink = "https://www.harshitaapptech.com/";
 
+//for live
+var connection = mysql.createConnection({
+    //properties of mysql connection
+    host: 'localhost',
+    user: 'root',
+    password: '',
+    database: 'harsmnhg_todos'
+});
+
+var app = express();
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
 var allowedOrigins = ['http://localhost:5000',
     'http://harshitapptech.com'];
     
@@ -20,19 +33,6 @@ app.use(cors({
         } return callback(null, true);
     }
 }));
-
-//for live
-var connection = mysql.createConnection({
-    //properties of mysql connection
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'harsmnhg_todos'
-});
-
-var app = express();
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
 app.listen(5000, () => {
     console.log("started");
