@@ -2,9 +2,24 @@ const express = require('express');
 const mysql = require('mysql');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken')
+const cors = require('cors');
 const SecretKey = "Uf0*wVVnkBVg+Yr@C4YSWBT";
 const HeaderKey = "Pz6WbvhZAQGsUtAxRJK3vtXCrJDW6kb3yMwtnGKu2kpfT9PRVUg8RuYqFWfvFptqftcF87mBbV7pJWmPCPR5fZentc3qQVTtGLbqbjvGquT5B8UT2Kvjk7BCUm7hqtkqmJ3yR6fMFdWkWwvjTjrtSZjs52TdKC5Xazvp6b22pKNQSybvNb4mAwwuzXQFLKM7Pq5htpNNg8ZJ9dZJUF8gqc3aFXywYvaFLMXWdNUfErL8GEgUR3sEpNajEXbUcLLh";
 const RedirectLink = "https://www.harshitaapptech.com/";
+
+var allowedOrigins = ['http://localhost:5000',
+    'http://harshitapptech.com'];
+    
+app.use(cors({
+    origin: function (origin, callback) {    // allow requests with no origin 
+        // (like mobile apps or curl requests)
+        if (!origin) return callback(null, true); if (allowedOrigins.indexOf(origin) === -1) {
+            var msg = 'The CORS policy for this site does not ' +
+                'allow access from the specified Origin.';
+            return callback(new Error(msg), false);
+        } return callback(null, true);
+    }
+}));
 
 //for live
 var connection = mysql.createConnection({
