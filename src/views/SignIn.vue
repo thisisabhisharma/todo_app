@@ -21,6 +21,7 @@
       <img @click="getUserData()" :src="userIcon" id="userPic"  width="50px" alt="">
       <p>{{ this.$store.state.profile.name }}</p>
       <p>{{ this.$store.state.profile.email }}</p>
+      <p></p>
     </div>
     <div  v-for="pic in pics" :key="pic" >
       <img :src="getImgUrl(pic)" v-bind:alt="getImgUrl">
