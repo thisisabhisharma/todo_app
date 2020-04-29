@@ -20,9 +20,6 @@ var app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-var allowedOrigins = ['http://localhost:5000',
-    'http://harshitapptech.com'];
-
 app.use(cors());
 
 app.listen(5000, () => {
@@ -119,6 +116,7 @@ app.post('/todo/api/login/', verifyHeader, function (req, res) {
 });
 
 //delete user
+//do not use this ight now
 app.get('/todo/api/remove-user/', verifyToken, function (req, res) {
 
     jwt.verify(req.token, SecretKey, (err, authData) => {
