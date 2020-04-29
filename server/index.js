@@ -22,7 +22,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 var allowedOrigins = ['http://localhost:5000',
     'http://harshitapptech.com'];
-    
+
 app.use(cors());
 
 app.listen(5000, () => {
@@ -83,12 +83,19 @@ app.post('/todo/api/login/', verifyHeader, function (req, res) {
                     connection.query("INSERT INTO `users`(`name`, `email`, `profile_url`) VALUES (?,?,?)", [name, email, photo], function (error, rows) {
                         if (!!error) {
                             console.log('error ', error);
-                            obj = {
-                                error: true,
-                                message: "error " + error,
-                                todo: null
+                            if (error.toString().includes("Duplicate entry")) {
+                                obj = {
+                                    error: true,
+                                    message: "This user already exists please try another email",
+                                }
+                                res.status(409).send(obj);
+                            } else {
+                                obj = {
+                                    error: true,
+                                    message: "error " + error,
+                                }
+                                res.status(400).send(obj);
                             }
-                            res.status(400).send(obj);
                         } else {
                             console.log('user created');
                             const obj = {
@@ -119,7 +126,7 @@ app.get('/todo/api/remove-user/', verifyToken, function (req, res) {
             res.sendStatus(401);
         } else {
             //user is verified
-            var userID = authData.email;
+            var userID = authData.user.email;
 
             connection.query("DELETE FROM users WHERE user_id = ?", [userID], function (error, rows) {
                 if (!!error) {
@@ -161,10 +168,13 @@ app.post('/todo/api/create-todo', verifyToken, function (req, res) {
             res.sendStatus(401);
         } else {
             //user is verified
-            var email = authData.email;
+            var email = authData.user.email;
             var text = req.body.text;
 
-            connection.query("INSERT INTO `todos`(`text`, `email`) VALUES (?,?)", [email, text], function (error, rows) {
+            console.log('this is text ' + text);
+            console.log('this is email ' + email);
+
+            connection.query("INSERT INTO `todos`(`email`, `todo_text`) VALUES (?, ?)", [email, text], function (error, rows) {
                 if (!!error) {
                     console.log('error ', error);
                     obj = {
@@ -207,7 +217,7 @@ app.get('/todo/api/complete/:todoID', verifyToken, function (req, res) {
                     console.log('completed');
                     obj = {
                         error: false,
-                        message: "Completed"
+                        message: "Done"
                     }
                     res.status(200).send(obj);
                 }
@@ -248,35 +258,36 @@ app.get('/todo/api/remove/:todoID', verifyToken, function (req, res) {
 });
 
 //get all todos of a user
-app.get('/todo/api/get-todo', verifyToken, function (req, res) {
+app.post('/todo/api/get-todo', verifyToken, function (req, res) {
 
     jwt.verify(req.token, SecretKey, (err, authData) => {
         if (!!err) {
             res.sendStatus(401);
         } else {
             //user is verified
-            var userID = authData.id;
-            var limit = 10;
+            var userID = authData.user.email;
 
-            connection.query("SELECT * FROM todos WHERE user_id = ? limit = ? AND removed != 1", [userID, limit], function (error, rows) {
-                if (!!error) {
-                    console.log('error ', error);
-                    obj = {
-                        error: true,
-                        message: "error " + error,
-                        todo: null
+            connection.query("SELECT todo_text, completed, time_created FROM todos " +
+                "WHERE email = ? AND removed = 0 ORDER BY time_created DESC LIMIT 10 ",
+                [userID], function (error, rows) {
+                    if (!!error) {
+                        console.log('error ', error);
+                        obj = {
+                            error: true,
+                            message: "error " + error,
+                            todo: null
+                        }
+                        res.status(400).send(obj);
+                    } else {
+                        console.log('count ');
+                        obj = {
+                            error: false,
+                            message: "You have some data",
+                            todo: rows
+                        }
+                        res.status(200).send(obj);
                     }
-                    res.status(400).send(obj);
-                } else {
-                    console.log('count ');
-                    obj = {
-                        error: false,
-                        message: "You have some data",
-                        todo: rows
-                    }
-                    res.status(200).send(obj);
-                }
-            });
+                });
         }
     });
 });

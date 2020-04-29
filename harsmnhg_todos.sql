@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Apr 24, 2020 at 07:55 AM
+-- Generation Time: Apr 29, 2020 at 12:52 PM
 -- Server version: 10.4.11-MariaDB
 -- PHP Version: 7.4.4
 
@@ -29,11 +29,11 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `todos` (
   `todo_id` int(20) NOT NULL,
-  `text` varchar(500) NOT NULL,
-  `complete` tinyint(1) NOT NULL DEFAULT 0,
-  `timestamp` timestamp NOT NULL DEFAULT current_timestamp(),
+  `email` varchar(100) NOT NULL,
+  `todo_text` varchar(500) NOT NULL,
+  `completed` tinyint(1) NOT NULL DEFAULT 0,
   `removed` tinyint(1) NOT NULL DEFAULT 0,
-  `user_id` int(10) NOT NULL
+  `time_created` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -43,11 +43,12 @@ CREATE TABLE `todos` (
 --
 
 CREATE TABLE `users` (
-  `user_id` int(10) NOT NULL,
+  `email` varchar(100) NOT NULL,
   `name` varchar(50) NOT NULL,
-  `email` varchar(50) NOT NULL,
   `profile_url` varchar(200) DEFAULT NULL,
-  `timestamp` timestamp NOT NULL DEFAULT current_timestamp()
+  `removed` tinyint(1) NOT NULL DEFAULT 0,
+  `timestamp` timestamp NOT NULL DEFAULT current_timestamp(),
+  `last_login` timestamp NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
@@ -59,13 +60,13 @@ CREATE TABLE `users` (
 --
 ALTER TABLE `todos`
   ADD PRIMARY KEY (`todo_id`),
-  ADD KEY `user_id` (`user_id`);
+  ADD KEY `email` (`email`);
 
 --
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
-  ADD PRIMARY KEY (`user_id`);
+  ADD PRIMARY KEY (`email`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -75,13 +76,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `todos`
 --
 ALTER TABLE `todos`
-  MODIFY `todo_id` int(20) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `users`
---
-ALTER TABLE `users`
-  MODIFY `user_id` int(10) NOT NULL AUTO_INCREMENT;
+  MODIFY `todo_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Constraints for dumped tables
@@ -91,7 +86,7 @@ ALTER TABLE `users`
 -- Constraints for table `todos`
 --
 ALTER TABLE `todos`
-  ADD CONSTRAINT `todos_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`);
+  ADD CONSTRAINT `todos_ibfk_1` FOREIGN KEY (`email`) REFERENCES `users` (`email`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
