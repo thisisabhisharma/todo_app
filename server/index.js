@@ -255,7 +255,7 @@ app.get('/todo/api/remove/:todoID', verifyToken, function (req, res) {
     });
 });
 
-//get all todos of a user
+//get all-- todos of a user
 app.get('/todo/api/get-todo', verifyToken, function (req, res) {
 
     jwt.verify(req.token, SecretKey, (err, authData) => {

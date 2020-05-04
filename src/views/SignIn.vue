@@ -37,9 +37,18 @@ export default {
     facebookLogin,
   },
   mounted(){
-    console.log('app mounted');
-    if (localStorage.getItem('token')) this.$store.state.token = JSON.parse(localStorage.getItem('token'));
-    console.log('store token value', this.$store.state.token);
+    //console.log('app mounted');
+    console.log('app mounted token length ' + localStorage.getItem('token'));
+    if ((localStorage.getItem('token').toString()).length() == 0){
+      console.log('inside if');
+    }
+    else{
+      console.log('inside else');
+    }
+    
+
+
+    // console.log('store token value', this.$store.state.token);
   },
 
   data() {
@@ -121,17 +130,18 @@ export default {
           }
         })
         .then((response) => {
-          var profile = response.data.token;
-          console.log("response is ", profile);
+          this.$store.state.token = response.data.token;
 
-          localStorage.setItem('token', JSON.stringify(this.profile))
-          console.log('store token value is ', this.$store.state.token);
+          localStorage.setItem('token', this.response.data.token)
+          console.log('store token value is ', profile);
         })
         .catch((error) => {
           console.log("error is: ", error);
         });
       }, 1000)
     },
+
+
 
     onLogin(callback) {
       this.isConnected = true;

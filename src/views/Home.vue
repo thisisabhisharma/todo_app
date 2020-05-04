@@ -42,9 +42,19 @@ export default {
           .then(response =>{
             console.log('api get request sent ',response.data)
             this.todos = response.data;
-          } )
+          })
           .catch(err => console.log('this is the error in api',err));
-      }
+      },
+
+      createTodo() {
+      setTimeout(() => {
+        axios({
+          method: 'post',
+          url: 'http://localhost:5000/todo/api/create-todo/',
+          headers: {'Authorization': 'Bearer '+this.$store.state.token}
+        })
+      }, 2000)
+    },
 }
 </script>
 
