@@ -1,0 +1,3 @@
+npm install express mysql body-parser jsonwebtoken cors
+
+npm install nodemon -g
