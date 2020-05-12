@@ -16,6 +16,11 @@ export default {
     Todos,
     AddTodo
   },
+  created(){
+    console.log('home mounted');
+    
+    // localStorage.setItem('age', '23');
+  },
   data() {
     return{
       todos: []

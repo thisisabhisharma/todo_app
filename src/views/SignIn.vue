@@ -36,8 +36,9 @@ export default {
   components: {
     facebookLogin,
   },
-  mounted(){
-    //console.log('app mounted');
+  created(){
+    console.log('siginin mounted');
+
     // console.log('app mounted token length ' + localStorage.getItem('token'));
     // if ((localStorage.getItem('token').toString()).length() == 0){
     //   console.log('inside if');
@@ -121,7 +122,7 @@ export default {
           method: 'post',
           url: baseURL + 'login/',
           headers: {
-        'key' : "Pz6WbvhZAQGsUtAxRJK3vtXCrJDW6kb3yMwtnGKu2kpfT9PRVUg8RuYqFWfvFptqftcF87mBbV7pJWmPCPR5fZentc3qQVTtGLbqbjvGquT5B8UT2Kvjk7BCUm7hqtkqmJ3yR6fMFdWkWwvjTjrtSZjs52TdKC5Xazvp6b22pKNQSybvNb4mAwwuzXQFLKM7Pq5htpNNg8ZJ9dZJUF8gqc3aFXywYvaFLMXWdNUfErL8GEgUR3sEpNajEXbUcLLh",
+        'key' : "",
       },
           data: {
             name: this.$store.state.profile.name,
